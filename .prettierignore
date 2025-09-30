@@ -1,0 +1,16 @@
+# Build output
+.next
+out
+build
+
+dist
+coverage
+
+# Dependencies
+node_modules
+
+# Generated files
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+README.md
