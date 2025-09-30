@@ -13,6 +13,7 @@ EventSphere is a Next.js 15 application for discovering and exploring local even
    ```bash
    pnpm install
    ```
+   This also sets up the Git pre-commit hook and generates Prisma files.
 2. Start the development server:
 
    ```bash
@@ -46,6 +47,13 @@ EventSphere is a Next.js 15 application for discovering and exploring local even
 - `pnpm format:fix` - apply Prettier formatting across the codebase.
 - `pnpm check` - convenience script that runs linting and formatting checks together.
 
+#### Database
+
+- `pnpm prisma:generate` - generate the Prisma Client based on the current schema.
+- `pnpm prisma:db:push` - sync the schema to the database without creating a migration.
+- `pnpm prisma:migrate` - create and apply a migration in development.
+- `pnpm prisma:studio` - open Prisma Studio to browse and edit data.
+
 #### Tooling
 
 - `pnpm prepare` - install or refresh Git hooks via `simple-git-hooks` (runs automatically after installs).
@@ -55,6 +63,14 @@ EventSphere is a Next.js 15 application for discovering and exploring local even
 - The project uses `simple-git-hooks` to register a `pre-commit` hook that runs `pnpm lint-staged`.
 - `lint-staged` limits work to staged files: TypeScript/JavaScript go through `next lint --fix --file …` and then `prettier --write`, while staged CSS, Markdown, MDX, and JSON files are just formatted with Prettier.
 - If the hook fails, the commit is aborted. Click view command output to see which file caused the issue, then manually apply the required formatting changes before committing again.
+
+## Database (Prisma)
+
+- Prisma is configured with a PostgreSQL datasource in `prisma/schema.prisma`.
+- Copy `.env.example` to `.env`, then replace the placeholder credentials in `DATABASE_URL` with your own connection string before running Prisma commands.
+- `src/lib/prisma.ts` exports a singleton `PrismaClient` so API routes, server actions, and scripts reuse the same instance during development.
+- Domain logic for Prisma-backed features should live in `src/lib/api`, while request validation schemas live in `src/lib/validators`. Keep route handlers decoupled by importing from these modules.
+- After adjusting the schema, run `pnpm prisma:generate` to refresh the client. Use `pnpm prisma:migrate` for dev migrations, or `pnpm prisma:db:push` for quick schema pushes. `pnpm prisma:studio` opens Prisma Studio for a GUI.
 
 ## Styling and UI components
 
