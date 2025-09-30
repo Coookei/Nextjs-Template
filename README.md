@@ -32,10 +32,29 @@ EventSphere is a Next.js 15 application for discovering and exploring local even
 
 ### Useful scripts
 
+#### Development
+
+- `pnpm dev` - start the Next.js development server with Turbopack.
+- `pnpm build` - create an optimized production build using Turbopack.
+- `pnpm start` - serve the production build locally.
+
+#### Quality
+
 - `pnpm lint` - run ESLint across the repo.
 - `pnpm lint:fix` - attempt to automatically fix lint issues.
-- `pnpm format` / `pnpm format:fix` - check or write Prettier formatting.
+- `pnpm format` - check Prettier formatting without writing changes.
+- `pnpm format:fix` - apply Prettier formatting across the codebase.
 - `pnpm check` - convenience script that runs linting and formatting checks together.
+
+#### Tooling
+
+- `pnpm prepare` - install or refresh Git hooks via `simple-git-hooks` (runs automatically after installs).
+
+## Pre-commit hooks
+
+- The project uses `simple-git-hooks` to register a `pre-commit` hook that runs `pnpm lint-staged`.
+- `lint-staged` limits work to staged files: TypeScript/JavaScript go through `next lint --fix --file …` and then `prettier --write`, while staged CSS, Markdown, MDX, and JSON files are just formatted with Prettier.
+- If the hook fails, the commit is aborted. Click view command output to see which file caused the issue, then manually apply the required formatting changes before committing again.
 
 ## Styling and UI components
 
