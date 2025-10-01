@@ -61,7 +61,7 @@ EventSphere is a Next.js 15 application for discovering and exploring local even
 ## Pre-commit hooks
 
 - The project uses `simple-git-hooks` to register a `pre-commit` hook that runs `pnpm lint-staged`.
-- `lint-staged` limits work to staged files: TypeScript/JavaScript go through `next lint --fix --file …` and then `prettier --write`, while staged CSS, Markdown, MDX, and JSON files are just formatted with Prettier.
+- `lint-staged` limits work to staged files: TypeScript/JavaScript go through `eslint --fix` and then `prettier --write`, while staged CSS, Markdown, MDX, and JSON files are just formatted with Prettier.
 - If the hook fails, the commit is aborted. Click view command output to see which file caused the issue, then manually apply the required formatting changes before committing again.
 
 ## Database (Prisma)
