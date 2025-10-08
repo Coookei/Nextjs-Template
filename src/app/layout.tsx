@@ -13,9 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EventSphere",
-  description:
-    "EventSphere is a dynamic and intuitive web application designed to help users discover, explore, and engage with local events happening in their city or desired location.",
+  title: "Next.js",
+  description: "A Next.js project.",
 };
 
 export default function RootLayout({
