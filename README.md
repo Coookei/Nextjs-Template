@@ -1,6 +1,13 @@
-# EventSphere
+# Next.js Project Template
 
-EventSphere is a Next.js 15 application for discovering and exploring local events. It uses pnpm for package management, Tailwind CSS v4 for styling, and shadcn/ui components for a consistent, composable UI.
+A Next.js 15 template that bundles the tooling you need to ship full-stack features fast. It uses pnpm for dependency management and comes with defaults for both the frontend and backend layers.
+
+- TypeScript-first Next.js 15 / React 19 setup with Turbopack dev builds.
+- Prisma (PostgreSQL) data access with generated clients and layered server utilities alongside an axios-based HTTP client.
+- An example Users API with client/server component examples.
+- Tailwind CSS v4 paired with shadcn/ui Radix primitives for cohesive UI building blocks.
+- React Hook Form wired up with Zod validators to keep forms type-safe.
+- ESLint, Prettier, lint-staged, and simple-git-hooks preconfigured to keep every commit clean.
 
 ## Requirements
 
@@ -64,13 +71,13 @@ EventSphere is a Next.js 15 application for discovering and exploring local even
 - `lint-staged` limits work to staged files: TypeScript/JavaScript go through `eslint --fix` and then `prettier --write`, while staged CSS, Markdown, MDX, and JSON files are just formatted with Prettier.
 - If the hook fails, the commit is aborted. Click view command output to see which file caused the issue, then manually apply the required formatting changes before committing again.
 
-## Database (Prisma)
+## Database (Prisma) & API Layers
 
-- Prisma is configured with a PostgreSQL datasource in `prisma/schema.prisma`.
-- Copy `.env.example` to `.env`, then replace the placeholder credentials in `DATABASE_URL` with your own connection string before running Prisma commands.
-- `src/lib/prisma.ts` exports a singleton `PrismaClient` so API routes, server actions, and scripts reuse the same instance during development.
-- Domain logic for Prisma-backed features should live in `src/lib/api`, while request validation schemas live in `src/lib/validators`. Keep route handlers decoupled by importing from these modules.
-- After adjusting the schema, run `pnpm prisma:generate` to refresh the client. Use `pnpm prisma:migrate` for dev migrations, or `pnpm prisma:db:push` for quick schema pushes. `pnpm prisma:studio` opens Prisma Studio for a GUI.
+- Prisma reads its PostgreSQL datasource from `prisma/schema.prisma`; copy `.env.example` to `.env` and set `DATABASE_URL` (and, for the browser client, `NEXT_PUBLIC_API_BASE_URL`) before running any commands.
+- `src/lib/prisma.ts` keeps a shared `PrismaClient` so API routes, server actions, and scripts all reuse the same instance.
+- Server-facing logic lives in `src/lib/api/server`, while browser code talks to axios helpers under `src/lib/api/client`, keeping Prisma on the server side only.
+- Validation helpers live in `src/lib/validators`; compose them with the server utilities and HTTP helpers to match your rendering mode.
+- After schema changes, run `pnpm prisma:generate`; use `pnpm prisma:migrate` for dev migrations, `pnpm prisma:db:push` for quick syncs, and `pnpm prisma:studio` for a GUI.
 
 ## Styling and UI components
 
