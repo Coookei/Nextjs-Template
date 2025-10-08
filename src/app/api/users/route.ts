@@ -1,13 +1,11 @@
-import { createUser, listUsers } from "@/lib/api/users";
+import { usersApi } from "@/lib/api";
 import { createUserSchema } from "@/lib/validators/users";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
-// example API for users using the decoupled lib/api/users.ts instead of a coupled prisma implementation
-
 export async function GET() {
   try {
-    const users = await listUsers();
+    const users = await usersApi.list();
     return NextResponse.json({ users });
   } catch (error) {
     return NextResponse.json(
@@ -24,7 +22,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(z.treeifyError(validation.error), { status: 400 });
 
   try {
-    const user = await createUser(validation.data);
+    const user = await usersApi.create(validation.data);
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     return NextResponse.json(
