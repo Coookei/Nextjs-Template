@@ -1,42 +1,75 @@
-# Next.js Project Template
+# Next.js 15 Project Template
 
-A Next.js 15 template that bundles the tooling you need to ship full-stack features fast. It uses pnpm for dependency management and comes with defaults for both the frontend and backend layers.
+A Next.js 15 template with React 19, Tailwind v4, Prisma, and shadcn/ui so you can build full-stack features fast, complete with an example users flow that shares Zod validators across server and client API layers.
 
-- TypeScript-first Next.js 15 / React 19 setup with Turbopack dev builds.
-- Prisma (PostgreSQL) data access with generated clients and layered server utilities alongside an axios-based HTTP client.
-- An example Users API with client/server component examples.
-- Tailwind CSS v4 paired with shadcn/ui Radix primitives for cohesive UI building blocks.
-- React Hook Form wired up with Zod validators to keep forms type-safe.
-- ESLint, Prettier, lint-staged, and simple-git-hooks preconfigured to keep every commit clean.
-
-## Requirements
-
-- Node.js 18.18 or newer
-- pnpm 10.17.1
+- TypeScript-first Next.js 15 / React 19 setup with Turbopack builds.
+- Prisma-backed data layer with a reusable server API (src/lib/api/server) that hides ORM details and an axios-powered client wrapper (src/lib/api/client) for browser calls - both share Zod validators so data stays in sync.
+- An example Users feature showing how both a client and server component work and use their appropriate API.
+- Tailwind CSS v4 with shadcn/ui primitives to compose UI fast.
+- ESLint, Prettier, lint-staged, and simple-git-hooks preconfigured to maintain consistent commits.
 
 ## Getting Started
+Follow these steps to set up the project:
 
-1. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-   This also sets up the Git pre-commit hook and generates Prisma files.
-2. Start the development server:
+### Prerequisites
 
-   ```bash
-   pnpm dev
-   ```
+- Node.js 20+ (LTS recommended)
+- [pnpm](https://pnpm.io/) 10+
+- Access to a PostgreSQL database
 
-   Open http://localhost:3000 to view the app.
+### 1. Clone the repository
 
-3. Create a production build:
-   ```bash
-   pnpm build
-   ```
-4. Preview the production build locally:
-   ```bash
-   pnpm start
-   ```
+```bash
+git clone https://github.com/Coookei/nextjs-template
+cd nextjs-template
+```
+
+### 2. Install dependencies
+
+If you do not have pnpm installed yet, follow the [pnpm installation guide](https://pnpm.io/installation).
+
+```bash
+pnpm install
+```
+
+> This also sets up the Git pre-commit hook and generates Prisma files.
+
+
+### 3. Configure secrets and environment
+
+Copy the example `.env` file and configure the variables:
+```bash
+cp .env.example .env
+```
+
+Or manually create the `.env` file in the project root:
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/public"
+NEXT_PUBLIC_API_BASE_URL="/api"
+```
+
+### 4. Apply database migrations
+
+For local development (creates the database and tables if needed):
+
+```bash
+prisma migrate dev
+```
+
+For production deployments, apply existing migrations without creating new ones:
+
+```bash
+prisma migrate deploy
+```
+
+### 5. Start the development server
+
+```bash
+pnpm dev
+```
+
+Visit `http://localhost:3000` to view the app.
+
 
 ### Useful scripts
 
@@ -56,10 +89,11 @@ A Next.js 15 template that bundles the tooling you need to ship full-stack featu
 
 #### Database
 
-- `pnpm prisma:generate` - generate the Prisma Client based on the current schema.
-- `pnpm prisma:db:push` - sync the schema to the database without creating a migration.
-- `pnpm prisma:migrate` - create and apply a migration in development.
-- `pnpm prisma:studio` - open Prisma Studio to browse and edit data.
+- `prisma generate` - generate the Prisma Client based on the current schema.
+- `prisma db push` - sync the schema to the database without creating a migration (handy for local prototyping).
+- `prisma migrate dev` - create a new migration from your schema changes and apply it in development.
+- `prisma migrate deploy` - apply any existing migrations in production.
+- `prisma studio` - open Prisma Studio to browse and edit data.
 
 #### Tooling
 
@@ -71,13 +105,19 @@ A Next.js 15 template that bundles the tooling you need to ship full-stack featu
 - `lint-staged` limits work to staged files: TypeScript/JavaScript go through `eslint --fix` and then `prettier --write`, while staged CSS, Markdown, MDX, and JSON files are just formatted with Prettier.
 - If the hook fails, the commit is aborted. Click view command output to see which file caused the issue, then manually apply the required formatting changes before committing again.
 
-## Database (Prisma) & API Layers
+## Data Layer (Prisma)
 
-- Prisma reads its PostgreSQL datasource from `prisma/schema.prisma`; copy `.env.example` to `.env` and set `DATABASE_URL` (and, for the browser client, `NEXT_PUBLIC_API_BASE_URL`) before running any commands.
-- `src/lib/prisma.ts` keeps a shared `PrismaClient` so API routes, server actions, and scripts all reuse the same instance.
-- Server-facing logic lives in `src/lib/api/server`, while browser code talks to axios helpers under `src/lib/api/client`, keeping Prisma on the server side only.
-- Validation helpers live in `src/lib/validators`; compose them with the server utilities and HTTP helpers to match your rendering mode.
-- After schema changes, run `pnpm prisma:generate`; use `pnpm prisma:migrate` for dev migrations, `pnpm prisma:db:push` for quick syncs, and `pnpm prisma:studio` for a GUI.
+- Prisma reads its datasource from `prisma/schema.prisma`.
+- `src/lib/prisma.ts` exposes a singleton `PrismaClient`, so routes, server actions, and scripts all reuse the same instance.
+- After schema changes run `prisma generate` to refresh the client, and run `prisma migrate dev` to create/apply the migration in development.
+- Samples are built around the `User` model in `prisma/schema.prisma` - remove or modify this to suit your own project.
+
+## API Layers
+
+- Server API (`src/lib/api/server`) - `usersApi` wraps Prisma queries/mutations so server components and actions stay decoupled from the ORM.
+- Client API (`src/lib/api/client`) - `usersClientApi` is usable in client components which makes requests to `/api/users` using the axios instance in `httpClient`.
+- Shared validation (`src/lib/validators`) - Zod keeps validation schemas consistent across the server and client components, and API routes.
+- Example usage - `UserListServer` directly uses the server API, while `UserListClient` uses the client API layer.
 
 ## Styling and UI components
 
@@ -101,9 +141,3 @@ If you ever need to inspect available components or their status, run:
 ```bash
 pnpm dlx shadcn@latest list
 ```
-
-## Recommended workflow
-
-- During development, keep `pnpm dev` running for hot reload and type checking.
-- Run `pnpm lint` and `pnpm format` before committing to ensure consistent quality.
-- When introducing new UI patterns, prefer composing existing shadcn/ui primitives before creating bespoke components.
