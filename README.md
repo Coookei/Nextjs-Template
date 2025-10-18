@@ -124,6 +124,7 @@ Visit `http://localhost:3000` to view the app.
 - Tailwind CSS v4 is loaded via `src/app/globals.css`.
 - Fonts are managed with the Next.js `next/font` API in `src/app/layout.tsx`, which exposes CSS custom properties used by Tailwind.
 - The shadcn/ui generator is configured via `components.json`. Generated components are located in `src/components/ui` so they can be customised.
+- To remove a component, you can just delete its file from the /ui folder. If the component had dependencies (like @radix-ui/react-dialog), you can optionally remove those from your package.json if you’re no longer using them anywhere else.
 
 ### Adding a new shadcn/ui component
 
@@ -135,9 +136,3 @@ Visit `http://localhost:3000` to view the app.
    - You can add multiple components at once, e.g. `pnpm dlx shadcn@latest add card badge`.
    - The generator respects `components.json`, so files will land in `src/components/ui`, using the existing aliases.
 3. Tailor the generated component as needed. Because components are copied into the repo, edits are safe and local.
-
-If you ever need to inspect available components or their status, run:
-
-```bash
-pnpm dlx shadcn@latest list
-```
