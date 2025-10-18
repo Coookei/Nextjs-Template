@@ -2,39 +2,40 @@
 
 import { usersClientApi } from "@/lib/api";
 import { User } from "@prisma/client";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 const UserListClient = () => {
+  // example component using client API to load users
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    // use a controller so if the component unmounts, the request is cancelled
+    const controller = new AbortController();
 
     const loadUsers = async () => {
       try {
-        const users = await usersClientApi.list(); // example using client API to load users
-        if (isMounted) setUsers(users);
-      } catch (e: unknown) {
+        const users = await usersClientApi.list({ signal: controller.signal });
+        setUsers(users);
+      } catch (e) {
+        if (axios.isCancel?.(e) || controller.signal.aborted) return;
         const message = e instanceof Error ? e.message : "Unknown error";
-        if (isMounted) setError(message);
+        setError(message);
       } finally {
-        if (isMounted) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     loadUsers();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => controller.abort();
   }, []);
 
   if (loading) return <div>Loading users…</div>;
   if (error)
     return (
       <div role="alert" style={{ color: "#c00" }}>
-        Failed to load users: {error}
+        Failed to load users on client: {error}
       </div>
     );
 
@@ -45,7 +46,7 @@ const UserListClient = () => {
       <p>Users loaded on client:</p>
       <ul>
         {users.map((u) => (
-          <li key={u.id}>{u.name}</li>
+          <li key={u.id}>{u.name ?? u.email}</li>
         ))}
       </ul>
     </div>
