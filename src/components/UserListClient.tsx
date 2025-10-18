@@ -32,9 +32,10 @@ const UserListClient = () => {
   }, []);
 
   if (loading) return <div>Loading users…</div>;
+
   if (error)
     return (
-      <div role="alert" style={{ color: "#c00" }}>
+      <div role="alert" className="text-red-700">
         Failed to load users on client: {error}
       </div>
     );
